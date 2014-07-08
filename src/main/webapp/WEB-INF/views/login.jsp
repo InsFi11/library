@@ -128,7 +128,7 @@
                                     <span>Login</span><sup>*</sup>
                                 </label>
                             </td>
-                            <td><input type="text" name="j_username" /></td>
+                            <td><input type="text" name="j_username" required/></td>
                         </tr>
                         <tr>
                             <td>
@@ -136,7 +136,7 @@
                                     <span>Password</span><sup>*</sup>
                                 </label>
                             </td>
-                            <td><input type="password" name="j_password" /></td>
+                            <td><input type="password" name="j_password" required/></td>
                         </tr>
                         <tr>
                             <td>

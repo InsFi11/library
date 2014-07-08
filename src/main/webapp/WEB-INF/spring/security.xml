@@ -19,7 +19,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd http://ww
 
 		<anonymous username="guest" granted-authority="ROLE_ANONYMOUS" />
 		<remember-me />
-        <csrf />
+
 	</http>
     <context:component-scan base-package="beingjavaguys.services" />
 	<authentication-manager>
