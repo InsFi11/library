@@ -1,0 +1,61 @@
+div.errorMessage{
+    font-size: 18px;
+    font-family: arial;
+    color: #E47D7D;
+    border: 1px solid #E47D7D;
+    padding: 2px;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+#registration tr td{
+    height: 35px;
+}
+#registration tr td:first-child{
+    text-align: right;
+    padding: 0 10px;
+    width: 200px;
+}
+#registration label{
+    cursor: pointer;
+}
+#registration table input,#registration table textarea{
+    height: 25px;
+    width: 300px;
+    font-size: 18px;
+}
+#registration table input:focus {
+    outline: #24d61f auto 5px;
+}
+#registration table input.wrong_input{
+    border:3px solid rgb(236, 133, 133);
+}
+#registration table input[type="radio"]{
+    height:20px;
+    width:20px;
+}
+#registration table.sex{
+    width:100px;
+}
+#registration table.sex tr td:first-child,#registration table.sex tr td:last-child {
+    text-align: center;
+    padding:0;
+    width: 50%;
+    height:10px;
+}
+#registration table textarea{
+    height: 100px;
+    padding-right:0;
+    margin-top:10px;
+}
+#registration .genre_div input{
+    height: 13px;
+    width: 20px;
+}
+#submit_reg{
+    position:relative;
+    float:right;
+    width:100px;
+    height:50px;
+}

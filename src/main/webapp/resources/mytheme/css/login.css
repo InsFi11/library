@@ -1,0 +1,37 @@
+div.errorMessage{
+    font-size: 18px;
+    font-family: arial;
+    color: #E47D7D;
+    border: 1px solid #E47D7D;
+    padding: 2px;
+
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+table.login{
+    position: relative;
+    width: 400px;
+    height: 100px;
+    margin-top: 50px;
+    margin-left: 50%;
+    left: -200px;
+}
+table.login tr td{
+    text-align: center;
+    padding: 0 10px;
+    width: 200px;
+}
+table.login tr td:first-child{
+    text-align: right;
+}
+table.login label{
+    cursor: pointer;
+}
+#submit_login{
+    position:relative;
+    width:100px;
+    height:30px;
+    margin-left: 50%;
+    left: -50px;
+}

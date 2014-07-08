@@ -1,0 +1,63 @@
+article.format-standard{
+	margin-bottom:50px;
+	border-bottom: 1px solid #fafafa;
+}
+img.book{
+    width: 105px;
+    height: 155px;
+}
+.block_image_left{
+    float: left;
+    margin-right: 10px;
+}
+.InfoBookPrevDesc_Text iframe{
+    width: 450px;
+    height: 155px;
+
+}
+.block_button{
+    width: 100%;
+    text-align: center;
+}
+.book_info_prev{
+	float: left;
+	padding-top: 60px;
+	width:200px;
+}
+.blockInfoBookPrev, .blockInfoBookPrevDesc{
+	float:left;
+}
+.blockInfoBookPrevDesc{
+	padding-top: 40px;
+	margin-left:15px;
+	width:440px;
+}
+.InfoBookPrevDesc_Text{
+	height:200px;
+	}
+.block_button{
+	height:40px;
+	padding-top:20px;
+}
+.block_button a{
+     border:1px solid #007aa7; /*border color dark blue */
+     background: #edbd9f; /*the color of the button is blue */
+     padding:5px 10px; /*add padding inside of the button*/
+     -moz-border-radius: 5px; /* add rounded corners */
+     -webkit-border-radius: 5px;
+     border-radius: 5px;
+     -webkit-box-shadow: 0 0 4px rgba(0,0,0, .75); /* add drop shadows */
+     -moz-box-shadow: 0 0 4px rgba(0,0,0, .75);
+     box-shadow: 0 0 4px rgba(0,0,0, .75);
+     color: #000000; /* text color is white */
+     font-size:1em; /* font size is 1em */
+     cursor:pointer; /* change cursor when hover */
+     font-family: cursive;
+     font-size: 14px;
+ }
+.block_button a:hover, .block_button a:focus {
+    background-color : #d1a68a; /* the background a little darker*/
+    -webkit-box-shadow: 0 0 1px rgba(0,0,0, .75); /* drop shadow is narrower to give a pushed effect */
+    -moz-box-shadow: 0 0 1px rgba(0,0,0, .75);
+    box-shadow: 0 0 1px rgba(0,0,0, .75);
+}

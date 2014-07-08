@@ -1,0 +1,47 @@
+package beingjavaguys.services;
+
+import beingjavaguys.dao.BooksDaoImpl;
+import beingjavaguys.domain.Book;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class BookServiceImpl{
+
+    @Autowired
+    BooksDaoImpl booksDao;
+
+
+    public void insertData(Book book) {
+        booksDao.insertData(book);
+    }
+
+
+    public List<Book> getBookList() {
+        return booksDao.getBookList();
+    }
+
+
+    public void deleteData(String id) {
+        booksDao.deleteData(id);
+
+    }
+    public List<Book> getBookListFromName(String bookName){return booksDao.getBookListFromName(bookName);}
+    public List<Book> getBookListFromGenre(String genre){return booksDao.getBookListFromGenre(genre);}
+    public List<Book> getBookListFromAuthor(String author){return booksDao.getBookListFromAuthor(author);}
+
+    public Book getBook(String id) {
+        return booksDao.getBook(id);
+    }
+
+
+    public void updateData(Book book) {
+        booksDao.updateData(book);
+
+    }
+
+
+
+}

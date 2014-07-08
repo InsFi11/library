@@ -1,0 +1,36 @@
+.block_information
+{
+    padding-top: 40px;
+    float:left;
+}
+.block_photoAndButtons {
+
+    float:right;
+    text-align: right;
+
+}
+img.user{
+
+}
+.block_button a{
+    border:1px solid #007aa7; /*border color dark blue */
+    background: #edbd9f; /*the color of the button is blue */
+    padding:5px 10px; /*add padding inside of the button*/
+    -moz-border-radius: 5px; /* add rounded corners */
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 0 4px rgba(0,0,0, .75); /* add drop shadows */
+    -moz-box-shadow: 0 0 4px rgba(0,0,0, .75);
+    box-shadow: 0 0 4px rgba(0,0,0, .75);
+    color: #000000; /* text color is white */
+    font-size:1em; /* font size is 1em */
+    cursor:pointer; /* change cursor when hover */
+    font-family: cursive;
+    font-size: 14px;
+}
+.block_button a:hover, .block_button a:focus {
+    background-color : #d1a68a; /* the background a little darker*/
+    -webkit-box-shadow: 0 0 1px rgba(0,0,0, .75); /* drop shadow is narrower to give a pushed effect */
+    -moz-box-shadow: 0 0 1px rgba(0,0,0, .75);
+    box-shadow: 0 0 1px rgba(0,0,0, .75);
+}

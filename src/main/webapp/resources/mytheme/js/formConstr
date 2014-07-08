@@ -1,0 +1,108 @@
+function ds(f) {
+    var e=document.getElementById(f);
+    if (!e) return false;
+
+    // Создать временную форму
+    var tmp_form = document.createElement("form");
+    tmp_form.method='get';
+    tmp_form.action='process.php';   // Адрес скрипта-обработчика формы
+    tmp_form.style.display='none';
+    document.getElementsByTagName('body')[0].appendChild(tmp_form);
+
+    // Перенести в нее все элементы
+    cf(e,tmp_form);
+
+    // Отправить созданную форму
+    tmp_form.submit();
+}
+
+
+//--------------------------------------------------------------------
+// Перенести значения полей в форму
+//--------------------------------------------------------------------
+function cf(e,f) {
+    for (var i=0; i<e.childNodes.length; i++) {
+        var el = e.childNodes[i];
+        var elName = el.nodeName.toLowerCase();
+        // Обработка input
+        if (elName=='input' && el.name!='') {
+            var type = el.type.toLowerCase();
+            switch (type) {
+                // Текстовое поле
+                case 'text': {
+                    var tmp_el = document.createElement("input");
+                    tmp_el.name=el.name;
+                    tmp_el.type='hidden';
+                    tmp_el.value=el.value;
+                    f.appendChild(tmp_el);
+                    break;
+                }
+                // Флажок checkbox
+                case 'checkbox': {
+                    if (el.checked) {
+                        var tmp_el = document.createElement("input");
+                        tmp_el.name=el.name;
+                        tmp_el.type='checkbox';
+                        tmp_el.value=el.value;
+                        f.appendChild(tmp_el);
+                        tmp_el.checked=true;
+                    }
+                    break;
+                }
+                // Флажок radio
+                case 'radio': {
+                    if (el.checked) {
+                        var tmp_el = document.createElement("input");
+                        tmp_el.name=el.name;
+                        tmp_el.type='radio';
+                        tmp_el.value=el.value;
+                        f.appendChild(tmp_el);
+                        tmp_el.checked=true;
+                    }
+                    break;
+                }
+                // Текстовое поле
+                case 'hidden': {
+                    var tmp_el = document.createElement("input");
+                    tmp_el.name=el.name;
+                    tmp_el.type='hidden';
+                    tmp_el.value=el.value;
+                    f.appendChild(tmp_el);
+                    break;
+                }
+                // Поле ввода пароля
+                case 'password': {
+                    var tmp_el = document.createElement("input");
+                    tmp_el.name=el.name;
+                    tmp_el.type='hidden';
+                    tmp_el.value=el.value;
+                    f.appendChild(tmp_el);
+                    break;
+                }
+                // Любые другие input'ы
+                default: {
+                    break;
+                }
+            }
+        }
+        // Обработка textarea
+        else if (elName=='textarea' && el.name!='') {
+            var tmp_el = document.createElement("textarea");
+            tmp_el.name=el.name;
+            tmp_el.value=el.value;
+            f.appendChild(tmp_el);
+        }
+        // Обработка select
+        else if (elName=='select' && el.name!='') {
+            var tmp_el = document.createElement("input");
+            tmp_el.name=el.name;
+            tmp_el.type='hidden';
+            tmp_el.value=el.value;
+            f.appendChild(tmp_el);
+        }
+        else {
+            // Обработать вложенный тег (рекурсия)
+            cf(el,f);
+        }
+    }
+}
