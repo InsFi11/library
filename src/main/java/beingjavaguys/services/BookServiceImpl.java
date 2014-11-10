@@ -1,11 +1,13 @@
 package beingjavaguys.services;
 
+import java.util.List;
+
 import beingjavaguys.dao.BooksDaoImpl;
+import beingjavaguys.dao.UserDaoImpl;
 import beingjavaguys.domain.Book;
 import org.springframework.beans.factory.annotation.Autowired;
+import beingjavaguys.domain.User;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class BookServiceImpl{
@@ -22,7 +24,7 @@ public class BookServiceImpl{
     public List<Book> getBookList() {
         return booksDao.getBookList();
     }
-
+    public Book findBookFetchGenre(int id) {return  booksDao.findBookFetchGenre(id);}
 
     public void deleteData(String id) {
         booksDao.deleteData(id);

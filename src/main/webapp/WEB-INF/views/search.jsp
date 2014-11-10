@@ -160,10 +160,17 @@
                                     </div>
                                     <div class="block_book_prev_category">
                                         <div class="book_info_prev_category">genre:</div>
-                                        <a href="search?search_input=${book.getGenre()}">
-                                        <span itemprop="genre">${book.getGenre()}
+                                        <c:forEach var="item" items="${book.getGenreList()}">
+                                            <a href="search?search_input=${item}">
+
+                                        <span itemprop="genre">${item}
+
                                         </span>
-                                        </a>
+
+                                            </a>
+                                            <c:if test="${book.getGenreList().indexOf(item) != book.getGenreList().size() - 1}"> ,
+                                            </c:if>
+                                        </c:forEach>
 
                                     </div>
                                     <div class="block_book_prev_category">
@@ -232,10 +239,17 @@
                                     </div>
                                     <div class="block_book_prev_category">
                                         <div class="book_info_prev_category">genre:</div>
-                                        <a href="search?search_input=${book.getGenre()}">
-                                        <span itemprop="genre">${book.getGenre()}
+                                        <c:forEach var="item" items="${book.getGenreList()}">
+                                            <a href="search?search_input=${item}">
+
+                                        <span itemprop="genre">${item}
+
                                         </span>
-                                        </a>
+
+                                            </a>
+                                            <c:if test="${book.getGenreList().indexOf(item) != book.getGenreList().size() - 1}"> ,
+                                            </c:if>
+                                        </c:forEach>
 
                                     </div>
                                     <div class="block_book_prev_category">

@@ -1,12 +1,16 @@
 package beingjavaguys.services;
 
-import beingjavaguys.dao.SeriesDaoImpl;
-import beingjavaguys.domain.Series;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.sql.Date;
 import java.util.List;
+
+import beingjavaguys.dao.BooksDaoImpl;
+import beingjavaguys.dao.SeriesDaoImpl;
+import beingjavaguys.dao.UserDaoImpl;
+import beingjavaguys.domain.Book;
+import beingjavaguys.domain.Series;
+import org.springframework.beans.factory.annotation.Autowired;
+import beingjavaguys.domain.User;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SeriesServiceImpl{
@@ -18,8 +22,8 @@ public class SeriesServiceImpl{
     public void insertData(Series series) {
         seriesDao.insertData(series);
     }
-
-
+    public Series findSeriesFetchGenre(int id) { return seriesDao.findSeriesFetchGenre(id);}
+    public Series findSeriesFetchBook(int id) {return  seriesDao.findSeriesFetchBook(id);}
     public List<Series> getSeriesList() {
         return seriesDao.getSeriesList();
     }

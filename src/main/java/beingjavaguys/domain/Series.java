@@ -1,10 +1,9 @@
 package beingjavaguys.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by InF on 04.06.2014.
@@ -20,8 +19,7 @@ public class Series extends IPagination{
     private String seriesName;
     @Column(name="preorder_price")
     private int preorderPrice;
-    @Column(name="genre")
-    private String genre;
+
     @Column(name="about")
     private String about;
     @Column(name="author")
@@ -65,14 +63,8 @@ public class Series extends IPagination{
         this.about = about;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
 
-    @Override
-    public String getGenre() {
-        return genre;
-    }
+
 
     @Override
     public String getAuthor() {
@@ -101,4 +93,28 @@ public class Series extends IPagination{
     }
     @Override
     public String getPrice(){return  preorderPrice+"";}
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            targetEntity=Genre.class,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(name="series_genre",
+            joinColumns={@JoinColumn(name="id_series")},
+            inverseJoinColumns={@JoinColumn(name="id_genre")})
+    private List<String> genreList = new ArrayList<String>();
+    public List<String> getGenreList() {
+        return genreList;
+    }
+    @OneToMany(
+            fetch = FetchType.LAZY,
+            targetEntity = Book.class,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(name="series_content",
+            joinColumns={@JoinColumn(name="id_series")},
+            inverseJoinColumns={@JoinColumn(name="id_book")})
+    private List<Book> bookList;
+    public List<Book> getBookList() {
+        return bookList;
+    }
 }

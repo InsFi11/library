@@ -94,21 +94,6 @@
         </header>
 
         <div id="menu">
-
-            <!---
-            <ul>
-                <li><a href="bookList?jspPage=ind">Books</a></li>
-                <li><a href="seriesList?jspPage=ind">Series</a></li>
-                <li class="search">
-                    <form action="/search" method="post">
-                        <input type="text" id="search_input" name="search_input" class="input_text" value=""  required="required"/>
-
-                        <input class="submit_button" id="search_submit" type="submit" value="Search" />
-                    </form>
-                </li>
-            </ul>
-            --->
-
             <ul class="ca-menu">
                 <li>
                     <a href="bookList?jspPage=ind">
@@ -187,13 +172,17 @@
                                 </div>
                                 <div class="block_book_prev_category">
                                     <div class="book_info_prev_category">genre:</div>
-                                    <a href="search?search_input=${book.getGenre()}">
+                                    <c:forEach var="item" items="${book.getGenreList()}">
+                                        <a href="search?search_input=${item}">
 
-                                        <span itemprop="genre">${book.getGenre()}
+                                        <span itemprop="genre">${item}
 
                                         </span>
 
-                                    </a>
+                                        </a>
+                                        <c:if test="${book.getGenreList().indexOf(item) != book.getGenreList().size() - 1}"> ,
+                                        </c:if>
+                                    </c:forEach>
 
 
                                 </div>
@@ -269,10 +258,17 @@
                                     </div>
                                     <div class="block_book_prev_category">
                                         <div class="book_info_prev_category">Genre:</div>
-                                        <a href="search?search_input=${book.getGenre()}">
-                                        <span itemprop="genre">${book.getGenre()}
+                                        <c:forEach var="item" items="${book.getGenreList()}">
+                                            <a href="search?search_input=${item}">
+
+                                        <span itemprop="genre">${item}
+
                                         </span>
-                                        </a>
+
+                                            </a>
+                                            <c:if test="${book.getGenreList().indexOf(item) != book.getGenreList().size() - 1}"> ,
+                                            </c:if>
+                                        </c:forEach>
 
                                     </div>
                                     <div class="block_book_prev_category">

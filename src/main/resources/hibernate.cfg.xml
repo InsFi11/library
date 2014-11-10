@@ -15,5 +15,8 @@
         <mapping class="beingjavaguys.domain.SeriesContent" />
         <mapping class="beingjavaguys.domain.SeriesPreorder" />
         <mapping class="beingjavaguys.domain.User" />
+        <mapping class="beingjavaguys.domain.Role" />
+        <mapping class="beingjavaguys.domain.Genre" />
+        <mapping class="beingjavaguys.domain.Permission" />
 	</session-factory>
 </hibernate-configuration>

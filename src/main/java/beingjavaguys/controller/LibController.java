@@ -5,33 +5,39 @@ import java.security.Timestamp;
 import java.sql.Date;
 import java.util.*;
 
+import beingjavaguys.domain.Book;
 import beingjavaguys.dao.SecurityUser;
 import beingjavaguys.domain.*;
 import beingjavaguys.domain.User;
 import beingjavaguys.services.*;
+import org.hibernate.Hibernate;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@Scope("session")
 @SuppressWarnings("deprecation")
+
 public class LibController {
 
 
-   private List<Integer> idList;
-    private Map<String, List<IPagination>> privateMap;
+    private List<Integer> idList;
+    private  Map<String, List<IPagination>> privateMap;
     private int searchCheker = 0;
     private String userId = "-123.2";
     private String userLogin = "-222.65";
     private String userIsLibrarian = "";
     List<String> userData;
-
 
     @Autowired
     UserServiceImpl userService;
@@ -49,6 +55,8 @@ public class LibController {
     PassTicketServiceImpl passTicketService;
     @Autowired
     ReadingRoomServiceImpl readingRoomService;
+    @Autowired
+    GenreServiceImpl genreService;
 
     @RequestMapping("/ind")
     public ModelAndView startData(@RequestParam(value = "pageNumber", defaultValue = "1" ) String pageNumber) {
@@ -61,7 +69,7 @@ public class LibController {
         {
             List<SeriesContent> seriesContentList = seriesContentService.getSeriesContentFromSeries(ser.getId()+"");
             if(!seriesContentList.isEmpty())
-            listCon.add(seriesContentList);
+                listCon.add(seriesContentList);
         }
 
         for (List<SeriesContent> list : listCon)
@@ -78,8 +86,8 @@ public class LibController {
         }
         for (List<SeriesContent> list : listCon)
         {
-           Integer id = list.get(0).getSeriesId();
-            Date date = list.get(list.size() - 1).getDatetimeOperation();
+            Integer id = list.get(0).getSeriesId();
+            java.sql.Date date = list.get(list.size() - 1).getDatetimeOperation();
             seriesService.updateDate(id.toString(),date);
         }
 
@@ -88,7 +96,7 @@ public class LibController {
 
         for(Book book : bookList)
         {
-
+            // List<String> genreList = book.getGenreList();
             book.setIsInCollection(seriesContentService.getSeriesContentFromBook(((Integer)book.getId()).toString()).isEmpty()? 0 : 1);
             bookService.updateData(book);
         }
@@ -109,64 +117,86 @@ public class LibController {
         userData = new ArrayList<String>();
         userData.add(userId);
         userData.add(userLogin);
-        userData.add(userIsLibrarian);
+        //userData.add(userIsLibrarian);
+
 
         Map<String,List> map = addPagination(paginationList, pageNumber);
         map.put("userData",userData);
         List<String> currentPage = new ArrayList<String>();
         currentPage.add(pageNumber);
         map.put("currentPage",currentPage);
+        //Hibernate.initialize( map.get("list"));
         return new ModelAndView("ind", "map", map);
 
 
     }
-   public  Map<String,List> addPagination(List<IPagination> paginationList, String pageNumber)
-   {
-       int tempNumPage;
-       if((paginationList.size())%10 != 0)
-       {
-           tempNumPage =  paginationList.size()/10 + 1;
-       }
-       else tempNumPage = paginationList.size()/10;
+    @Transactional
+    public  Map<String,List> addPagination(List<IPagination> paginationList, String pageNumber)
+    {
+        int tempNumPage;
+        if((paginationList.size())%10 != 0)
+        {
+            tempNumPage =  paginationList.size()/10 + 1;
+        }
+        else tempNumPage = paginationList.size()/10;
 
-       List<List<IPagination>> listSeparatedPage = new ArrayList<List<IPagination>>();
-       for(int i = 0; i < tempNumPage; i++)
-           listSeparatedPage.add(new ArrayList<IPagination>());
+        List<List<IPagination>> listSeparatedPage = new ArrayList<List<IPagination>>();
+        for(int i = 0; i < tempNumPage; i++)
+            listSeparatedPage.add(new ArrayList<IPagination>());
 
-       int i = 0;
-       for(IPagination item : paginationList)
-       {
+        int i = 0;
+        for(IPagination item : paginationList)
+        {
             i++;
-           if (i == 1)
-               listSeparatedPage.get(0).add(item);
-           else
-               listSeparatedPage.get(i/11).add(item);
+            if (i == 1)
+                listSeparatedPage.get(0).add(item);
+            else
+                listSeparatedPage.get(i/11).add(item);
 
-       }
+        }
 
-       List<Integer> listPageNum = new ArrayList<Integer>();
-       for(int j = 0; j < tempNumPage; j++)
-       {
-           listPageNum.add(j + 1);
-       }
+        List<Integer> listPageNum = new ArrayList<Integer>();
+        for(int j = 0; j < tempNumPage; j++)
+        {
+            listPageNum.add(j + 1);
+        }
 
-       Map<String,List> map = new HashMap<String, List>();
-       map.put("list", listSeparatedPage.get(Integer.parseInt(pageNumber) - 1));
-       map.put("listPageNum",listPageNum);
+        Map<String,List> map = new HashMap<String, List>();
+        //for(IPagination item :listSeparatedPage.get(Integer.parseInt(pageNumber) - 1))
+        List<IPagination> tempList = listSeparatedPage.get(Integer.parseInt(pageNumber) - 1);
 
-       return map;
-   }
+        for(int counter = 0; counter < tempList.size();counter++)
+
+            if (tempList.get(counter).getClass() == Book.class) {
+                Book b = (Book) tempList.get(counter);
+                tempList.set(counter, bookService.findBookFetchGenre(b.getId()));
+                //Hibernate.initialize(b.getGenreList());
+
+
+            }
+            else{
+                Series s = (Series) tempList.get(counter);
+                tempList.set(counter, seriesService.findSeriesFetchGenre(s.getId()));
+            }
+
+
+
+        map.put("list", listSeparatedPage.get(Integer.parseInt(pageNumber) - 1));
+        map.put("listPageNum",listPageNum);
+
+        return map;
+    }
 
     @RequestMapping("/logOut")
     public String logOut()
     {
-         userId = "-123.2";
-         userLogin = "-222.65";
-         userIsLibrarian = "";
+        userId = "-123.2";
+        userLogin = "-222.65";
+        userIsLibrarian = "";
         return "redirect:/ind";
     }
     @RequestMapping("/bookList")
-     public ModelAndView re(@RequestParam(value = "jspPage", defaultValue ="bookList" ) String jspPage,@RequestParam(value = "pageNumber", defaultValue = "1" ) String pageNumber) {
+    public ModelAndView re(@RequestParam(value = "jspPage", defaultValue ="bookList" ) String jspPage,@RequestParam(value = "pageNumber", defaultValue = "1" ) String pageNumber) {
 
         List<IPagination> seriesList = new ArrayList<IPagination>();
         seriesList.addAll(privateMap.get("seriesList"));
@@ -194,13 +224,13 @@ public class LibController {
             map = addPagination(bookList, pageNumber);
         }
         else{
-         map.put("list", bookList);
+            map.put("list", bookList);
         }
         map.put("userData",userData);
         List<String> currentPage = new ArrayList<String>();
         currentPage.add(pageNumber);
         map.put("currentPage",currentPage);
-        return  new ModelAndView("bookList", "map", map);
+        return  new  ModelAndView ("bookList", "map", map);
 
 
     }
@@ -241,7 +271,7 @@ public class LibController {
     }
 
 
-
+    @Transactional
     @RequestMapping("/search")
     public ModelAndView search(@RequestParam(value="search_input", defaultValue = "nothing") String string,@RequestParam(value = "pageNumber", defaultValue = "1" ) String pageNumber) {
 
@@ -253,11 +283,21 @@ public class LibController {
             paginationList = new ArrayList<IPagination>();
             Set<Book> bookListFromAuthor = new HashSet<Book>(bookService.getBookListFromAuthor(string));
             Set<Book> bookListFromName = new HashSet<Book>(bookService.getBookListFromName(string));
-            Set<Book> bookListFromGenre = new HashSet<Book>(bookService.getBookListFromGenre(string));
+            Set<Book> bookListFromGenre = new HashSet<Book>();
+            if(genreService.findGenreFromNameFetchBook(string) != null)
+                bookListFromGenre = new HashSet<Book>(genreService.findGenreFromNameFetchBook(string).getBookList());
 
 
             Set<Series> seriesListFromName = new HashSet<Series>(seriesService.getSeriesListFromName(string));
-            Set<Series> seriesListFromGenre = new HashSet<Series>(seriesService.getSeriesListFromGenre(string));
+            Set<Series> seriesListFromGenre = new HashSet<Series>();
+            Genre s = new Genre();
+            Book b = new Book();
+            System.out.println(b +""+ s);
+            if(genreService.findGenreFromNameFetchSeries(string) != null){
+               s = genreService.findGenreFromNameFetchSeries(string);
+                seriesListFromGenre = new HashSet<Series>(genreService.findGenreFromNameFetchSeries(string).getSeriesList());
+            }
+
             Set<Series> seriesListFromAuthor = new HashSet<Series>(seriesService.getSeriesListFromAuthor(string));
 
 
@@ -293,8 +333,8 @@ public class LibController {
 
 
 
-                privateMap.put("bookList", booksSortedList);
-                privateMap.put("seriesList", seriesSortedList);
+            privateMap.put("bookList", booksSortedList);
+            privateMap.put("seriesList", seriesSortedList);
 
            /* if(!booksSortedList.isEmpty())
                 privateMap.put("bookList", booksSortedList);
@@ -303,14 +343,14 @@ public class LibController {
 */
         }
         else {
-                paginationList.clear();
+            paginationList.clear();
 
-                    paginationList.addAll(privateMap.get("bookList"));
-                    paginationList.addAll(privateMap.get("seriesList"));
+            paginationList.addAll(privateMap.get("bookList"));
+            paginationList.addAll(privateMap.get("seriesList"));
 
 
-                Collections.sort(paginationList);
-            }
+            Collections.sort(paginationList);
+        }
 
         searchCheker = 1;
 
@@ -334,7 +374,7 @@ public class LibController {
 
             if(book.getName().contains(string))
                 bookListTemp.add(book);
-            else if(book.getGenre().contains(string))
+            else if(book.getGenreList().contains(string))
                 bookListTemp.add(book);
             else if(book.getAuthor().contains(string))
                 bookListTemp.add(book);
@@ -357,7 +397,7 @@ public class LibController {
         {
             if(series.getName().contains(string))
                 seriesListTemp.add(series);
-            else if(series.getGenre().contains(string))
+            else if(series.getGenreList().contains(string))
                 seriesListTemp.add(series);
             else if(series.getAuthor().contains(string))
                 seriesListTemp.add(series);
@@ -385,12 +425,12 @@ public class LibController {
 
 
 
-		Map<String, List> map = new HashMap<String, List>();
-		map.put("genderList", genderList);
+        Map<String, List> map = new HashMap<String, List>();
+        map.put("genderList", genderList);
         map.put("idList",idList);
         map.put("userData",userData);
-		return new ModelAndView("reg", "map", map);
-	}
+        return new ModelAndView("reg", "map", map);
+    }
 
 
 
@@ -398,7 +438,7 @@ public class LibController {
     public ModelAndView getLoginPage(@RequestParam(value = "bookId", defaultValue = "-5") String bookId, @RequestParam(value = "seriesId", defaultValue = "-6") String seriesId)
     {
         if(bookId.equals("-5") && seriesId.equals("-6"))
-        return new ModelAndView("login");
+            return new ModelAndView("login");
         else if(!bookId.equals("-5") && seriesId.equals("-6"))
             return new ModelAndView("loginToBook","bookId",bookId);
         else
@@ -448,25 +488,25 @@ public class LibController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            UserDetails returnUser =
-                    (UserDetails) authentication.getPrincipal();
+        UserDetails returnUser =
+                (UserDetails) authentication.getPrincipal();
 
-            userId = userService.getUserListFromLogin(returnUser.getUsername()).get(0).getUserId() + "";
-            userLogin = returnUser.getUsername();
-            userIsLibrarian = ((Boolean) userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian()).toString();
+        userId = userService.getUserListFromLogin(returnUser.getUsername()).get(0).getUserId() + "";
+        userLogin = returnUser.getUsername();
+      //  userIsLibrarian = ((Boolean) userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian()).toString();
 
-            userData.set(0, userId);
-            userData.set(1, userLogin);
-            userData.set(2, userIsLibrarian);
+        userData.set(0, userId);
+        userData.set(1, userLogin);
+      //  userData.set(2, userIsLibrarian);
 
 
-            if (userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian())
-                return new ModelAndView("redirect:/librarian?userId=" + userId);
-
-            else
-                return new ModelAndView("redirect:/user?userId=" + userId);
+//        if (userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian())
+//            return new ModelAndView("redirect:/librarian?userId=" + userId);
+//
+//        else
+            return new ModelAndView("redirect:/user?userId=" + userId);
         //}
-      // else return new ModelAndView("redirect:/login");
+        // else return new ModelAndView("redirect:/login");
     }
     @RequestMapping("/loginRequstToDBandgoTobook")
     public ModelAndView loginUsertoBook(@RequestParam("bookId") String bookId, @RequestParam String login, @RequestParam String password) {
@@ -478,22 +518,13 @@ public class LibController {
         userListFromEmail.addAll(userListFromLogin);
         User returnUser = userListFromEmail.get(0);
 
-       // userId      = returnUser.getUserId()+"";
-       // userLogin   = returnUser.getLogin();
-       // userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            UserDetails userDetails =
-                    (UserDetails) authentication.getPrincipal();
+        userId      = returnUser.getUserId()+"";
+        userLogin   = returnUser.getLogin();
+        // userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
 
-            userData.add(userService.getUserListFromLogin(userDetails.getUsername()).get(0).getUserId() + "");
-            userData.add(userDetails.getUsername());
-            userData.add(userService.getUserListFromLogin(userDetails.getUsername()).get(0).getIsLibrarian() ? "1" : "0" );
-        }
         userData.set(0,userId);
         userData.set(1,userLogin);
-        userData.set(2,userIsLibrarian);
-
+        // userData.set(2,userIsLibrarian);
         Map<String, List> map = new HashMap<String, List>();
         List<User> userList = new ArrayList<User>();
         userList.add(returnUser);
@@ -502,7 +533,7 @@ public class LibController {
 
 
 
-            return new ModelAndView("redirect:/book?id_book="+bookId);
+        return new ModelAndView("redirect:/book?id_book="+bookId);
     }
     @RequestMapping("/loginRequstToDBandgoToseries")
     public ModelAndView loginUsertoSeries(@RequestParam("seriesId") String seriesId, @RequestParam String login, @RequestParam String password) {
@@ -516,11 +547,11 @@ public class LibController {
 
         userId      = returnUser.getUserId()+"";
         userLogin   = returnUser.getLogin();
-        userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
+        // userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
 
         userData.set(0,userId);
         userData.set(1,userLogin);
-        userData.set(2,userIsLibrarian);
+        //userData.set(2,userIsLibrarian);
         Map<String, List> map = new HashMap<String, List>();
         List<User> userList = new ArrayList<User>();
         userList.add(returnUser);
@@ -541,19 +572,17 @@ public class LibController {
             List<User> userList = userService.getUserListFromLogin(user.getLogin());
             if(!userList.isEmpty()) return new ModelAndView("redirect:/reg");
             else
-            userService.insertData(user);
+                userService.insertData(user);
             List<User> userList1 = userService.getUserListFromLogin(user.getLogin());
             user.setUserId(userList1.get(0).getUserId());
             Map<String, List> map = new HashMap<String, List>();
-
-
             userId      = user.getUserId()+"";
             userLogin   = user.getLogin();
-            userIsLibrarian = ((Boolean)user.getIsLibrarian()).toString();
+            //  userIsLibrarian = ((Boolean)user.getIsLibrarian()).toString();
 
             userData.set(0,userId);
             userData.set(1,userLogin);
-            userData.set(2,userIsLibrarian);
+            // userData.set(2,userIsLibrarian);
 
             map.put("userData",userData);
             return new ModelAndView("redirect:/user?userId="+user.getUserId(),"map",map);
@@ -608,11 +637,15 @@ public class LibController {
         List<Series> seriesList = new ArrayList<Series>();
         seriesList.add(series);
         List<IPagination> bookList = new ArrayList<IPagination>();
-        List<SeriesContent> seriesContentList = seriesContentService.getSeriesContentFromSeries(series.getId()+"");
-
-        for(SeriesContent seriesContent : seriesContentList)
+        // List<SeriesContent> seriesContentList = seriesContentService.getSeriesContentFromSeries(series.getId()+"");
+        List<Book> tempBookList = seriesService.findSeriesFetchBook(series.getId()).getBookList();
+//        for(SeriesContent seriesContent : seriesContentList)
+//        {
+//            bookList.add(bookService.getBook(seriesContent.getBookId() + ""));
+//        }
+        for(Book book : tempBookList)
         {
-            bookList.add(bookService.getBook(seriesContent.getBookId() + ""));
+            bookList.add(bookService.getBook(book.getId()+""));
         }
         Collections.sort(bookList);
 
@@ -626,16 +659,16 @@ public class LibController {
 
     }
 
-   @RequestMapping("/addToCollection")
+    @RequestMapping("/addToCollection")
     public ModelAndView res1(@RequestParam("bookId") String bookId) {
 
         List<IPagination> seriesList = new ArrayList<IPagination>();
 
-            seriesList.addAll(seriesService.getSeriesList());
-            Collections.sort(seriesList);
-            privateMap = new HashMap<String, List<IPagination>>();
+        seriesList.addAll(seriesService.getSeriesList());
+        Collections.sort(seriesList);
+        privateMap = new HashMap<String, List<IPagination>>();
 
-            privateMap.put("seriesList", seriesList);
+        privateMap.put("seriesList", seriesList);
 
         List<String> bookIdList = new ArrayList<String>();
         bookIdList.add(bookId);
@@ -715,7 +748,7 @@ public class LibController {
         {
             result.setString("This Login is free");
         }
-           else
+        else
         {
             result.setString("This Login is using");
         }
@@ -767,9 +800,10 @@ public class LibController {
     public String updateUserInf(@ModelAttribute User user) {
         if (user != null)
             userService.updateData(user);
-        if(!user.getIsLibrarian())
-        return "redirect:/user?userId="+user.getUserId();
-        else return "redirect:/librarian?userId="+user.getUserId();
+        // if(!user.getIsLibrarian())
+        // return "redirect:/user?userId="+user.getUserId();
+        //  else
+        return "redirect:/librarian?userId="+user.getUserId();
     }
 
 
@@ -826,7 +860,7 @@ public class LibController {
         return "redirect:/user?id_user=" + userId;
     }
     @RequestMapping("/changePass")
-     public ModelAndView editUserInf(@RequestParam("id_user") String userId) {
+    public ModelAndView editUserInf(@RequestParam("id_user") String userId) {
 
         return new ModelAndView("changePass","userId",userId);
     }
@@ -851,7 +885,7 @@ public class LibController {
 
 
 
-            return new ModelAndView("deleteUser","userId",userId);
+        return new ModelAndView("deleteUser","userId",userId);
 
     }
 
@@ -863,21 +897,21 @@ public class LibController {
         User user = userService.getUser(userId);
         if(user.getPassword().equals(password) && user.getSecretQuestion().equals(secretQuestion))
         {
-           PassTicket pas = passTicketService.getPassTicketFromUser(userId);
-           if(pas != null)
-           passTicketService.deleteData(pas.getPassticketId()+"");
+            PassTicket pas = passTicketService.getPassTicketFromUser(userId);
+            if(pas != null)
+                passTicketService.deleteData(pas.getPassticketId()+"");
             List<SeriesPreorder> seriesPreorderList = seriesPreorderService.getSeriesPreorderFromUser(userId);
             if(!seriesPreorderList.isEmpty())
-           for(SeriesPreorder ser : seriesPreorderList ) {
+                for(SeriesPreorder ser : seriesPreorderList ) {
 
-               seriesPreorderService.deleteData(ser.getSeriesPreorderId()+"");
-           }
+                    seriesPreorderService.deleteData(ser.getSeriesPreorderId()+"");
+                }
             List<BooksOrder> booksOrderList = booksOrderService.getBooksOrderFromUser(userId);
             if(!booksOrderList.isEmpty())
-           for(BooksOrder booksOrder : booksOrderList){
-                booksOrderService.deleteData(booksOrder.getBooksOrderId()+"");
-           }
-           userService.deleteData(userId);
+                for(BooksOrder booksOrder : booksOrderList){
+                    booksOrderService.deleteData(booksOrder.getBooksOrderId()+"");
+                }
+            userService.deleteData(userId);
             return new ModelAndView("redirect:/logOut");
         }
         else
@@ -889,10 +923,10 @@ public class LibController {
     public ModelAndView basketView(@RequestParam("userId") String userId){
 
 
-    List<BooksOrder> booksOrderList = booksOrderService.getBooksOrderFromUser(userId);
-    List<SeriesPreorder> seriesPreorderList = seriesPreorderService.getSeriesPreorderFromUser(userId);
-    List<PassTicket> passTicketList =new ArrayList<PassTicket>();
-    passTicketList.add(passTicketService.getPassTicketFromUser(userId));
+        List<BooksOrder> booksOrderList = booksOrderService.getBooksOrderFromUser(userId);
+        List<SeriesPreorder> seriesPreorderList = seriesPreorderService.getSeriesPreorderFromUser(userId);
+        List<PassTicket> passTicketList =new ArrayList<PassTicket>();
+        passTicketList.add(passTicketService.getPassTicketFromUser(userId));
 
         if(!booksOrderList.isEmpty())
             for(BooksOrder booksOrder : booksOrderList)
@@ -906,16 +940,16 @@ public class LibController {
                 seriesPreorder.setSeriesAuthor(seriesService.getSeries(seriesPreorder.getSeriesId() + "").getAuthor());
                 seriesPreorder.setPrice(Integer.valueOf(seriesService.getSeries(seriesPreorder.getSeriesId()+"").getPrice()));
             }
-    Map<String, List> map = new HashMap<String, List>();
-    map.put("booksOrderList",booksOrderList);
-    map.put("seriesPreorderList",seriesPreorderList);
-    map.put("passTicketList",passTicketList);
-    map.put("userData",userData);
+        Map<String, List> map = new HashMap<String, List>();
+        map.put("booksOrderList",booksOrderList);
+        map.put("seriesPreorderList",seriesPreorderList);
+        map.put("passTicketList",passTicketList);
+        map.put("userData",userData);
 
 
 
 
-    return new ModelAndView("basket","map",map);
+        return new ModelAndView("basket","map",map);
     }
     @RequestMapping("/about")
     public ModelAndView about() {
@@ -987,7 +1021,7 @@ public class LibController {
         map.put("bookList",bookList);
         map.put("hours",hours);
 
-            return new ModelAndView("bookChoose","map",map);
+        return new ModelAndView("bookChoose","map",map);
 
     }
     @RequestMapping("/chooseBookStep2")

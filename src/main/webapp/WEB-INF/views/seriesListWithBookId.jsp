@@ -95,8 +95,17 @@
                                 <div class="block_book_prev_category">
                                     <div class="book_info_prev_category">genre:</div>
 
-                                        <span itemprop="genre">${series.getGenre()}
+                                    <c:forEach var="item" items="${series.getGenreList()}">
+                                        <a href="search?search_input=${item}">
+
+                                        <span itemprop="genre">${item}
+
                                         </span>
+
+                                        </a>
+                                        <c:if test="${series.getGenreList().indexOf(item) != series.getGenreList().size() - 1}"> ,
+                                        </c:if>
+                                    </c:forEach>
 
 
                                 </div>

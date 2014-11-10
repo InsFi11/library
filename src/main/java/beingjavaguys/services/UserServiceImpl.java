@@ -1,38 +1,48 @@
 package beingjavaguys.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
 import beingjavaguys.dao.SecurityUser;
 import beingjavaguys.dao.UserDaoImpl;
-import beingjavaguys.domain.User;
+import netscape.security.Privilege;
+import netscape.security.UserTarget;
 import org.springframework.beans.factory.annotation.Autowired;
+import beingjavaguys.domain.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
-public class UserServiceImpl implements UserDetailsService {
+public class UserServiceImpl  implements UserDetailsService {
 
-	@Autowired
+    @Autowired
     UserDaoImpl userDao;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
         // load user
-        User user = userDao.getUserListFromLogin(username).get(0);
+        List<User> userList = userDao.getUserListFromLogin(username);
+        User user;
+        if(!userList.isEmpty())
+            user = userDao.getUserListFromLogin(username).get(0);
+        else user = null;
 
         if (user != null) {
 
             // convert roles
 
-            List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+            // List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
 
-                roles.add(new GrantedAuthorityImpl(user.getPrivileges()));
+            //roles.add(new GrantedAuthorityImpl("ROLE_USER"));
+            Collection<GrantedAuthority> authorities = user.getAuthorities();
 
 
             // initialize user
@@ -40,7 +50,7 @@ public class UserServiceImpl implements UserDetailsService {
                     user.getLogin(),
                     user.getPassword(),
                     true, true, true, true,
-                    roles
+                    authorities
             );
 
             securityUser.setUser(user);
@@ -50,34 +60,34 @@ public class UserServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("No user with username '" + username + "' found!");
         }
     }
-	public void insertData(User user) {
-		userDao.insertData(user);
-	}
+    public void insertData(User user) {
+        userDao.insertData(user);
+    }
 
 
-	public List<User> getUserList() {
-		return userDao.getUserList();
-	}
+    public List<User> getUserList() {
+        return userDao.getUserList();
+    }
 
 
-	public void deleteData(String id) {
-		userDao.deleteData(id);
-		
-	}
+    public void deleteData(String id) {
+        userDao.deleteData(id);
+
+    }
     public List<User> getUserListFromLoginandPass(String login, String password){return userDao.getUserListFromLoginandPass(login,password);}
     public List<User> getUserListFromEmailandPass(String email, String password){return userDao.getUserListFromEmailandPass(email,password);}
     public List<User> getUserListFromLogin(String login) { return userDao.getUserListFromLogin(login);}
     public List<User> getUserListFromEmail(String email) { return userDao.getUserListFromEmail(email);}
-	public User getUser(String id) {
-		return userDao.getUser(id);
-	}
+    public User getUser(String id) {
+        return userDao.getUser(id);
+    }
     public int getUseridFromEmail(String email) {return  userDao.getUseridFromEmail(email);}
 
     public void updateData(User user) {
-		userDao.updateData(user);
-		
-	}
+        userDao.updateData(user);
+
+    }
 
 
-	
+
 }

@@ -151,10 +151,17 @@
                                 </div>
                                 <div class="block_book_prev_category">
                                     <div class="book_info_prev_category">Genre:</div>
-                                    <a href="search?search_input=${series.getGenre()}">
-                                        <span itemprop="genre">${series.getGenre()}
+                                    <c:forEach var="item" items="${series.getGenreList()}">
+                                        <a href="search?search_input=${item}">
+
+                                        <span itemprop="genre">${item}
+
                                         </span>
-                                    </a>
+
+                                        </a>
+                                        <c:if test="${series.getGenreList().indexOf(item) != series.getGenreList().size() - 1}"> ,
+                                        </c:if>
+                                    </c:forEach>
 
                                 </div>
                                 <div class="block_book_prev_category">

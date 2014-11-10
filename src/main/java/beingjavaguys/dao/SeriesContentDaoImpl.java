@@ -62,6 +62,7 @@ public class SeriesContentDaoImpl  {
         return seriesContentList;
     }
     @Transactional
+
     public  List<SeriesContent> getSeriesContentFromBook(String id) {
 
         List seriesContentList = sessionFactory.getCurrentSession().createQuery("from SeriesContent where id_book like '" + id +"'").list();

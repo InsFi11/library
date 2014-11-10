@@ -1,18 +1,23 @@
 package beingjavaguys.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.Hibernate;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.Serializable;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by InF on 04.06.2014.
  */
+import javax.persistence.*;
 
 @Entity
 @Table(name = "book")
-public class Book extends IPagination{
+public class Book extends IPagination implements Serializable{
+
 
     @Id
     @Column(name="id_book")
@@ -23,9 +28,6 @@ public class Book extends IPagination{
 
     @Column(name="nameBook")
     private String bookName;
-
-    @Column(name="genre")
-    private String genre;
 
     @Column(name="amount")
     private int amount;
@@ -68,14 +70,7 @@ public class Book extends IPagination{
         this.bookName = bookName;
     }
 
-    @Override
-    public String getGenre() {
-        return genre;
-    }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
 
     @Override
     public String getAuthor() {
@@ -143,4 +138,33 @@ public class Book extends IPagination{
     @Override
     public String getPrice(){return  retailPrice+"";}
 
+    @ManyToMany(
+            fetch = FetchType.LAZY,
+            targetEntity=Genre.class,
+            cascade = {CascadeType.ALL}
+    )
+    @JoinTable(name="book_genre",
+            joinColumns={@JoinColumn(name="id_book")},
+            inverseJoinColumns={@JoinColumn(name="id_genre")})
+    private List<String> genreList = new ArrayList<String>();
+    public List<String> getGenreList() {
+        return genreList;
+    }
+
+
+    public void setGenreList(List<String> genreList) {
+        this.genreList = genreList;
+    }
+//    @ManyToOne(
+//            fetch = FetchType.LAZY,
+//            targetEntity = Series.class,
+//            cascade = {CascadeType.ALL}
+//    )
+//    @JoinTable(name="series_content",
+//            joinColumns={@JoinColumn(name="id_book")},
+//            inverseJoinColumns={@JoinColumn(name="id_series")})
+//    private Series series;
+//    public Series getSeriesList() {
+//        return series;
+//    }
 }
