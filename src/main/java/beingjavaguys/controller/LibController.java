@@ -36,7 +36,6 @@ public class LibController {
     private int searchCheker = 0;
     private String userId = "-123.2";
     private String userLogin = "-222.65";
-    private String userIsLibrarian = "";
     List<String> userData;
 
     @Autowired
@@ -192,7 +191,6 @@ public class LibController {
     {
         userId = "-123.2";
         userLogin = "-222.65";
-        userIsLibrarian = "";
         return "redirect:/ind";
     }
     @RequestMapping("/bookList")
