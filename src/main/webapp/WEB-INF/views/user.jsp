@@ -52,7 +52,7 @@
                 </a>
             </div>
 
-            <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+            <sec:authorize access="isAnonymous()">
 
                 <div class="user_actions">
                     <a href="reg">
@@ -62,12 +62,12 @@
                         Log In
                     </a>
                 </div>
-            </c:if>
-            <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
+            </sec:authorize>
+            <sec:authorize access="isAuthenticated()">
                 <div class="user_actions">
 
                     <a href="user?userId=${map.userData.get(0)}">
-                            ${map.userData.get(1)}
+                        <sec:authentication property="principal.username" />
                     </a>
                     <a href="logOut">
                         Log out
@@ -76,7 +76,7 @@
                         <img src="<c:url value="/resources/basket1.jpg" />" width="20" height="20" alt="basket">
                     </a>
                 </div>
-            </c:if>
+            </sec:authorize>
             <div class="clear"></div>
         </header>
 

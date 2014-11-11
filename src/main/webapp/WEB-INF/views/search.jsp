@@ -52,7 +52,7 @@
                 </a>
             </div>
 
-            <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+            <sec:authorize access="isAnonymous()">
 
                 <div class="user_actions">
                     <a href="reg">
@@ -62,30 +62,30 @@
                         Log In
                     </a>
                 </div>
-            </c:if>
-            <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
+            </sec:authorize>
+            <sec:authorize access="isAuthenticated()">
                 <div class="user_actions">
 
-                    <c:if test="${map.userData.get(2) == 'false'}">
+                    <sec:authorize access="hasRole('ROLE_USER')">
                         <a href="user?userId=${map.userData.get(0)}">
-                                ${map.userData.get(1)}
+                            <sec:authentication property="principal.username" />
                         </a>
-                    </c:if>
-                    <c:if test="${map.userData.get(2) == 'true'}">
+                    </sec:authorize>
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">
                         <a href="librarian?userId=${map.userData.get(0)}">
-                                ${map.userData.get(1)}
+                            <sec:authentication property="principal.username" />
                         </a>
-                    </c:if>
+                    </sec:authorize>
                     <a href="logOut">
                         Log out
                     </a>
-                    <c:if test="${map.userData.get(2) != 'true'}">
+                    <sec:authorize access="hasRole('ROLE_USER')">
                         <a href="basket?userId=${map.userData.get(0)}">
                             <img src="<c:url value="/resources/basket1.jpg" />" width="20" height="20" alt="basket">
                         </a>
-                    </c:if>
+                    </sec:authorize>
                 </div>
-            </c:if>
+            </sec:authorize>
             <div class="clear"></div>
         </header>
 
@@ -122,14 +122,14 @@
         <div class="main_content">
             <h2>News</h2>
             <div id="posts-list">
-                <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+                <sec:authorize access="isAnonymous()">
                     <center>
                         To ORDER, Please
                         <a href="login">
                             Log in
                         </a>
                     </center>
-                </c:if>
+                </sec:authorize>
                 <c:forEach var="book" items="${map.list}">
                     <c:if test="${book.getClass().name == 'beingjavaguys.domain.Book' && book.getAmount() != 0}">
 
@@ -195,16 +195,18 @@
 
                                 </div>
                                 <div class="block_button">
-                                    <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
-                                        <c:if test="${map.userData.get(2) == 'false'}">
+                                     <sec:authorize access="isAuthenticated()">
+                                        <sec:authorize access="hasRole('ROLE_USER')">
 
                                             <input type="hidden" id="id_user" value="${map.userData.get(0)}">
                                             <input type="button" value="Order" onclick="doAjaxOrder(${book.getId()})">
-                                        </c:if>
-                                        <c:if test="${map.userData.get(2) == 'true' && book.getIsInCollection() == 0}">
+                                        </sec:authorize>
+                                         <sec:authorize access="hasRole('ROLE_ADMIN')">
+                                        <c:if test="${book.getIsInCollection() == 0}">
                                             <a href="addToCollection?bookId=${book.getId()}" title="AddToCollection" class="but_comments">Add To Collection</a>
                                         </c:if>
-                                    </c:if>
+                                        </sec:authorize>
+                                    </sec:authorize>
                                 </div>
                             </div>
                             <div class="clear"></div>
@@ -274,14 +276,14 @@
 
                                 </div>
                                 <div class="block_button">
-                                    <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
-                                        <c:if test="${map.userData.get(2) == 'false'}">
+                                    <sec:authorize access="isAuthenticated()">
+                                        <sec:authorize access="hasRole('ROLE_USER')">
 
                                             <input type="hidden" id="id_user" value="${map.userData.get(0)}">
                                             <input type="button" value="PreOrder" onclick="doAjaxPreOrder(${book.getId()})">
-                                        </c:if>
+                                        </sec:authorize>
 
-                                    </c:if>
+                                    </sec:authorize>
                                 </div>
                             </div>
                             <div class="clear"></div>

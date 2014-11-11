@@ -52,7 +52,7 @@
                     Library
                 </a>
             </div>
-            <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+            <sec:authorize access="isAnonymous()">
 
                 <div class="user_actions">
                     <a href="reg">
@@ -62,30 +62,30 @@
                         Log In
                     </a>
                 </div>
-            </c:if>
-            <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
+           </sec:authorize>
+            <sec:authorize access="isAuthenticated()">
                 <div class="user_actions">
 
-                    <c:if test="${map.userData.get(2) == 'false'}">
+                    <sec:authorize access="hasRole('ROLE_USER')">
                         <a href="user?userId=${map.userData.get(0)}">
-                                ${map.userData.get(1)}
+                            <sec:authentication property="principal.username" />
                         </a>
-                    </c:if>
-                    <c:if test="${map.userData.get(2) == 'true'}">
+                    </sec:authorize>
+                    <sec:authorize access="hasRole('ROLE_ADMIN')">
                         <a href="librarian?userId=${map.userData.get(0)}">
-                                ${map.userData.get(1)}
+                            <sec:authentication property="principal.username" />
                         </a>
-                    </c:if>
+                    </sec:authorize>
                     <a href="logOut">
                         Log out
                     </a>
-                    <c:if test="${map.userData.get(2) != 'true'}">
+                    <sec:authorize access="hasRole('ROLE_USER')">
                         <a href="basket?userId=${map.userData.get(0)}">
                             <img src="<c:url value="/resources/basket1.jpg" />" width="20" height="20" alt="basket">
                         </a>
-                    </c:if>
+                   </sec:authorize>
                 </div>
-            </c:if>
+            </sec:authorize>
             <div class="clear"></div>
         </header>
 

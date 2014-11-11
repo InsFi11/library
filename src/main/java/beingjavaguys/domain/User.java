@@ -126,6 +126,7 @@ public class User{
         for (Role role : roles) {
             perms.addAll(role.getPermissions());
         }
+
         return perms;
     }
 

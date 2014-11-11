@@ -63,14 +63,14 @@
         <div class="main_content">
 
             <div id="posts-list">
-                <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+                <sec:authorize access="isAnonymous()">
                     <center>
                         To ORDER, Please
                         <a href="login">
                             Log in
                         </a>
                     </center>
-                </c:if>
+                </sec:authorize>
                 <c:forEach var="book" items="${map.bookList}">
                     <article class="format-standard">
                         <div class="blockInfoBookPrev">

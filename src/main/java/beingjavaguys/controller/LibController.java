@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Controller;
@@ -35,7 +36,7 @@ public class LibController {
     private  Map<String, List<IPagination>> privateMap;
     private int searchCheker = 0;
     private String userId = "-123.2";
-    private String userLogin = "-222.65";
+
     List<String> userData;
 
     @Autowired
@@ -115,8 +116,6 @@ public class LibController {
 
         userData = new ArrayList<String>();
         userData.add(userId);
-        userData.add(userLogin);
-        //userData.add(userIsLibrarian);
 
 
         Map<String,List> map = addPagination(paginationList, pageNumber);
@@ -190,7 +189,6 @@ public class LibController {
     public String logOut()
     {
         userId = "-123.2";
-        userLogin = "-222.65";
         return "redirect:/ind";
     }
     @RequestMapping("/bookList")
@@ -490,21 +488,10 @@ public class LibController {
                 (UserDetails) authentication.getPrincipal();
 
         userId = userService.getUserListFromLogin(returnUser.getUsername()).get(0).getUserId() + "";
-        userLogin = returnUser.getUsername();
-      //  userIsLibrarian = ((Boolean) userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian()).toString();
-
         userData.set(0, userId);
-        userData.set(1, userLogin);
-      //  userData.set(2, userIsLibrarian);
 
-
-//        if (userService.getUserListFromLogin(returnUser.getUsername()).get(0).getIsLibrarian())
-//            return new ModelAndView("redirect:/librarian?userId=" + userId);
-//
-//        else
             return new ModelAndView("redirect:/user?userId=" + userId);
-        //}
-        // else return new ModelAndView("redirect:/login");
+
     }
     @RequestMapping("/loginRequstToDBandgoTobook")
     public ModelAndView loginUsertoBook(@RequestParam("bookId") String bookId, @RequestParam String login, @RequestParam String password) {
@@ -517,12 +504,10 @@ public class LibController {
         User returnUser = userListFromEmail.get(0);
 
         userId      = returnUser.getUserId()+"";
-        userLogin   = returnUser.getLogin();
-        // userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
+
 
         userData.set(0,userId);
-        userData.set(1,userLogin);
-        // userData.set(2,userIsLibrarian);
+
         Map<String, List> map = new HashMap<String, List>();
         List<User> userList = new ArrayList<User>();
         userList.add(returnUser);
@@ -544,12 +529,8 @@ public class LibController {
         User returnUser = userListFromEmail.get(0);
 
         userId      = returnUser.getUserId()+"";
-        userLogin   = returnUser.getLogin();
-        // userIsLibrarian = ((Boolean)returnUser.getIsLibrarian()).toString();
 
         userData.set(0,userId);
-        userData.set(1,userLogin);
-        //userData.set(2,userIsLibrarian);
         Map<String, List> map = new HashMap<String, List>();
         List<User> userList = new ArrayList<User>();
         userList.add(returnUser);
@@ -575,12 +556,9 @@ public class LibController {
             user.setUserId(userList1.get(0).getUserId());
             Map<String, List> map = new HashMap<String, List>();
             userId      = user.getUserId()+"";
-            userLogin   = user.getLogin();
-            //  userIsLibrarian = ((Boolean)user.getIsLibrarian()).toString();
 
             userData.set(0,userId);
-            userData.set(1,userLogin);
-            // userData.set(2,userIsLibrarian);
+
 
             map.put("userData",userData);
             return new ModelAndView("redirect:/user?userId="+user.getUserId(),"map",map);
@@ -615,9 +593,12 @@ public class LibController {
     @RequestMapping("/book")
     public ModelAndView sendBook(@RequestParam("id_book") String id) {
 
-        Book book = bookService.getBook(id);
+       // Book book = bookService.getBook(id);
+        Book book = bookService.findBookFetchGenre(Integer.valueOf(id));
         List<Book> bookList = new ArrayList<Book>();
+
         bookList.add(book);
+
         Map<String, List> map = new HashMap<String, List>();
         map.put("bookList",bookList);
         map.put("userData",userData);
@@ -664,6 +645,12 @@ public class LibController {
 
         seriesList.addAll(seriesService.getSeriesList());
         Collections.sort(seriesList);
+
+        for(int i = 0; i< seriesList.size();i++)
+        {
+            Series s = (Series) seriesList.get(i);
+            seriesList.set(i, seriesService.findSeriesFetchGenre(s.getId()));
+        }
         privateMap = new HashMap<String, List<IPagination>>();
 
         privateMap.put("seriesList", seriesList);
@@ -783,6 +770,7 @@ public class LibController {
 
 
         user = userService.getUser(userId);
+
         List<User> userList = new ArrayList<User>();
         userList.add(user);
         List<String> genderList = new ArrayList<String>();
@@ -796,12 +784,19 @@ public class LibController {
     }
     @RequestMapping("/updateUserInf")
     public String updateUserInf(@ModelAttribute User user) {
-        if (user != null)
+        if (user != null) {
+            user.setRoles(userService.getUser(user.getUserId() + "").getRoles());
             userService.updateData(user);
-        // if(!user.getIsLibrarian())
-        // return "redirect:/user?userId="+user.getUserId();
-        //  else
-        return "redirect:/librarian?userId="+user.getUserId();
+            String rolename;
+            for (GrantedAuthority authority : user.getAuthorities()) {
+                rolename = authority.getAuthority();
+
+                if (rolename.equals("ROLE_ADMIN")) return "redirect:/librarian?userId="+user.getUserId();
+                if (rolename.equals("ROLE_USER")) return "redirect:/user?userId="+user.getUserId();
+            }
+        }
+        else return "redirect:/ind";
+        return "";
     }
 
 

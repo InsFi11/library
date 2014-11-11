@@ -56,7 +56,7 @@
                 </a>
             </div>
 
-            <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+            <sec:authorize access="isAnonymous()">
 
                 <div class="user_actions">
                     <a href="reg">
@@ -66,18 +66,18 @@
                         Log In
                     </a>
                 </div>
-            </c:if>
-            <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
+            </sec:authorize>
+            <sec:authorize access="isAuthenticated()">
                 <div class="user_actions">
 
                     <a href="user?userId=${map.userData.get(0)}">
-                            ${map.userData.get(1)}
+                        <sec:authentication property="principal.username" />
                     </a>
                     <a href="logOut">
                         Log out
                     </a>
                 </div>
-            </c:if>
+            </sec:authorize>
             <div class="clear"></div>
         </header>
 
@@ -112,7 +112,7 @@
         </div>
         <div class="spacer"></div>
         <div class="main_content">
-        <c:if test="${map.userData.get(0) == '-123.2' && map.userData.get(1) == '-222.65'}">
+            <sec:authorize access="isAnonymous()">
 
             <h2>Registration</h2>
             <form:form action="/insert" method="post" id="registration" modelAttribute="user" commandName="user">
@@ -243,15 +243,15 @@
                 <div class="spacer"></div>
 
             </form:form>
-            </c:if>
-        <c:if test="${map.userData.get(0) != '-123.2' && map.userData.get(1) != '-222.65'}">
+            </sec:authorize>
+            <sec:authorize access="isAuthenticated()">
             <center>
             Please <a href="logOut">
                 Log out
             </a>
             first!!
             </center>
-            </c:if>
+            </sec:authorize>
         </div>
     </div>
     <div id="footer_spacer"></div>

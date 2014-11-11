@@ -72,6 +72,7 @@
                 <div class="user_actions">
 
                     <sec:authorize access="hasRole('ROLE_USER')">
+
                         <a href="user?userId=${map.userData.get(0)}">
                             <sec:authentication property="principal.username" />
                         </a>

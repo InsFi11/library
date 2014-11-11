@@ -205,7 +205,9 @@
 
                 <div class="spacer"></div>
                 <form:hidden path="userId" value="${map.userList.get(0).getUserId()}" />
-                <form:hidden path="isLibrarian" value="${map.userList.get(0).getIsLibrarian()}" />
+                <%--<form:hidden path="roles" value="${map.userList.get(0).getRoles()}" />--%>
+
+
             </form:form>
         </div>
     </div>
